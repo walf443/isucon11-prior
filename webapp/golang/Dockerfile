@@ -16,8 +16,6 @@ RUN go build \
 
 FROM jwilder/dockerize as dockerize
 
-RUN ls -alh /
-
 FROM alpine as runner
 
 COPY --from=dockerize /usr/local/bin/dockerize /
