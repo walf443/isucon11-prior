@@ -1,6 +1,15 @@
 ---
 version: "3.9"
 services:
+  nginx:
+    image: nginx:1.21
+    ports:
+      - 80:80
+    links:
+      - app
+    volumes:
+      - ./nginx/:/etc/nginx:ro
+      - ./docker/nginx/log:/var/log/nginx
   mysql:
     image: mysql:8.0
     container_name: mysql
