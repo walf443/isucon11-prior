@@ -110,19 +110,21 @@ func getReservations(r *http.Request, s *Schedule) error {
 }
 
 func getReservationsCount(r *http.Request, s *Schedule) error {
-	rows, err := db.QueryxContext(r.Context(), "SELECT * FROM `reservations` WHERE `schedule_id` = ?", s.ID)
+	rows, err := db.QueryxContext(r.Context(), "SELECT COUNT(`id`) FROM `reservations` WHERE `schedule_id` = ? GROUP BY `schedule_id`", s.ID)
 	if err != nil {
 		return err
 	}
 
 	defer rows.Close()
 
-	reserved := 0
+	var count int
 	for rows.Next() {
-		reserved++
+		err = rows.Scan(&count)
+		if err != nil {
+			return err
+		}
 	}
-	s.Reserved = reserved
-
+	s.Reserved = count
 	return nil
 }
 
