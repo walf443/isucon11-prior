@@ -1,0 +1,37 @@
+---
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: isucon2021_prior
+      MYSQL_USER: isucon
+      MYSQL_PASS: isucon
+      MYSQL_ROOT_PASSWORD: isucon
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+    - ./docker/db/data:/var/lib/mysql
+    - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+    - 3306:3306
+    healthcheck:
+      test: mysqladmin ping -uroot -p$$MYSQL_ROOT_PASSWORD
+  app:
+    build:
+      context: .
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: isucon
+    ports:
+      - 9292:9292
+    links:
+      - mysql
+    volumes:
+      - ./public:/public
+    depends_on:
+        mysql:
+          condition: service_healthy
