@@ -14,10 +14,14 @@ RUN go build \
     -o /go/bin/main \
     -ldflags '-s -w'
 
+FROM jwilder/dockerize as dockerize
 
-FROM scratch as runner
+FROM alpine as runner
 
+COPY --from=dockerize /usr/local/bin/dockerize /
 COPY --from=builder /go/bin/main /app/main
+
+ENV DB_HOST localhost
 
 ENTRYPOINT ["/app/main"]
 
